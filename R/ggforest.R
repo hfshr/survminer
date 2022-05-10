@@ -84,7 +84,7 @@ ggforest <- function(model, data = NULL,
   toShow <- cbind(allTermsDF, coef[inds, ])[, c("var", "level", "N", "p.value", "estimate", "conf.low", "conf.high", "pos")]
   toShowExp <- toShow[, 5:7]
   toShowExp[is.na(toShowExp)] <- 0
-  toShowExp <- format(exp(toShowExp), digits = noDigits, scientific = FALSE, nsmall = new_digits)
+  toShowExp <- format(exp(toShowExp), digits = noDigits, scientific = FALSE, nsmall = 4)
   toShowExpClean <- data.frame(toShow,
     pvalue = signif(toShow[, 4], noDigits + 1),
     toShowExp
