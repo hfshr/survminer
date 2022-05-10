@@ -91,8 +91,6 @@ ggforest <- function(model, data = NULL,
   )
   toShowExpClean$estimate.1 <- format(round(as.numeric(toShowExpClean$estimate.1), digits = 4), nsmall = 4)
   toShowExpClean$estimate.1[which(toShowExpClean$estimate.1 == "0.0000")] <- "<0.0001"
-  print(toShowExpClean$estimate.1 )
-  test <<- toShowExpClean
   toShowExpClean$stars <- paste0(
     round(toShowExpClean$p.value, noDigits + 1), " ",
     ifelse(toShowExpClean$p.value < 0.05, "*", ""),
