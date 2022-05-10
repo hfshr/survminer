@@ -84,11 +84,15 @@ ggforest <- function(model, data = NULL,
   toShow <- cbind(allTermsDF, coef[inds, ])[, c("var", "level", "N", "p.value", "estimate", "conf.low", "conf.high", "pos")]
   toShowExp <- toShow[, 5:7]
   toShowExp[is.na(toShowExp)] <- 0
-  toShowExp <- format(exp(toShowExp), digits = noDigits)
+  toShowExp <- format(exp(toShowExp), digits = noDigits, scientific = FALSE, nsmall = new_digits)
   toShowExpClean <- data.frame(toShow,
     pvalue = signif(toShow[, 4], noDigits + 1),
     toShowExp
   )
+  toShowExpClean$estimate.1 <- format(round(as.numeric(toShowExpClean$estimate.1), digits = 4), nsmall = 4)
+  toShowExpClean$estimate.1[which(toShowExpClean$estimate.1 == "0.0000")] <- "<0.0001"
+  print(toShowExpClean$estimate.1 )
+  test <<- toShowExpClean
   toShowExpClean$stars <- paste0(
     round(toShowExpClean$p.value, noDigits + 1), " ",
     ifelse(toShowExpClean$p.value < 0.05, "*", ""),
@@ -96,11 +100,14 @@ ggforest <- function(model, data = NULL,
     ifelse(toShowExpClean$p.value < 0.001, "*", "")
   )
   toShowExpClean$ci <- paste0("(", toShowExpClean[, "conf.low.1"], " - ", toShowExpClean[, "conf.high.1"], ")")
+
   toShowExpClean$estimate.1[is.na(toShowExpClean$estimate)] <- refLabel
   toShowExpClean$stars[which(toShowExpClean$p.value < 0.001)] <- "<0.001 ***"
   toShowExpClean$stars[is.na(toShowExpClean$estimate)] <- ""
   toShowExpClean$ci[is.na(toShowExpClean$estimate)] <- ""
   toShowExpClean$estimate[is.na(toShowExpClean$estimate)] <- 0
+
+  toShowExpClean$ci[is.na(toShowExpClean$estimate)] <- ""
   toShowExpClean$var <- as.character(toShowExpClean$var)
   toShowExpClean$var[duplicated(toShowExpClean$var)] <- ""
   # make label strings:
@@ -108,7 +115,7 @@ ggforest <- function(model, data = NULL,
 
   # flip order
   toShowExpClean <- toShowExpClean[nrow(toShowExpClean):1, ]
-  
+
   # get min/max CI values to place where Inf would be
   ci_h <- toShowExpClean$conf.high[is.finite(as.numeric(toShowExpClean$conf.high.1))]
   ci_l <- toShowExpClean$conf.low[!near(as.numeric(toShowExpClean$conf.low.1), 0)]
@@ -130,6 +137,7 @@ ggforest <- function(model, data = NULL,
   y_cistring <- rangeplot[1] + cpositions[3] * width
   y_stars <- rangeb[2]
   x_annotate <- seq_len(nrow(toShowExpClean))
+
 
   # geom_text fontsize is in mm (https://github.com/tidyverse/ggplot2/issues/1828)
   annot_size_mm <- fontsize *
@@ -212,3 +220,5 @@ ggforest <- function(model, data = NULL,
   # invisible(p)
   ggpubr::as_ggplot(gt)
 }
+
+
